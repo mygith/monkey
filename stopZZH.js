@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mygith/monkey
 // @match       https://www.zhihu.com/*
 // @grant       none
-// @version     0.1
+// @version     0.2
 // @author      mygith
 // @license     GPL License
 // @description 模拟点击实现内容屏蔽
@@ -12,7 +12,7 @@
     'use strict';
 
     // 配置区====================================================
-    const stopWords = ['小说', '小米', '华为', '男生', '女生', '男朋友', '女朋友', '神器', '虐文', '脱毛', '爱美', '全女', '舔狗', '彩礼', '副业', '抑郁', '跨境电商'];
+    const stopWords = ['小说', '小米', '华为', '男生', '女生','男人','女人','匿名', '男朋友', '女朋友', '神器', '虐文', '脱毛', '爱美', '全女', '舔狗', '彩礼', '副业', '抑郁', '跨境电商'];
     const targetSelector = '.Topstory-content, .QuestionPage-main';
     const cardSelector = '.Card:not([data-zf-processed])';
     const titleSelector = '.ContentItem-title, [data-za-detail-view-element_name="Title"], .QuestionHeader-title';
@@ -79,7 +79,7 @@
 
         if (stopWords.some(w => title.includes(w))) {
             card.dataset.zfStatus = 'processing';
-            const success = await performBlock(card);
+            performBlock(card);
         } else {
             card.dataset.zfStatus = 'passed';
         }
