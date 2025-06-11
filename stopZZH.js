@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        知乎智能屏蔽
+// @name        知乎屏蔽
 // @namespace   https://github.com/mygith/monkey
 // @match       https://www.zhihu.com/
 // @grant       none
-// @version     0.2
+// @version     0.3
 // @author      mygith
 // @license     GPL License
 // @description 模拟点击实现内容屏蔽
@@ -12,10 +12,18 @@
     'use strict';
 
     // 配置区====================================================
-    const stopWords = ['小说', '小米', '华为', '少儿编程', '男生', '女生', '男人', '女人', '匿名', '男朋友', '女朋友', '神器', '虐文', '脱毛', '爱美', '全女', '舔狗', '彩礼', '副业', '抑郁', '跨境电商'];
+    const titleStopWords = ['NPD', 'INTP', '北大', '清华', '00元', '小说', '基建狂魔', '出国', '出了国', '中国学生', '留学', '韩流',
+        '小米', '华为', '尊界', '长城', '比亚迪', '鸿蒙', '问界', '品牌', '明星', 'NAS', '环保', '健康', '618', '护肤', '敏感肌', '面膜', '新品',
+        '跨境电商', '副业', '赚钱', '海外', '富贵', '适合普通人', '赚麻了', '神器', '脱毛', '爱美', '少儿编程', '颜值',
+        '暧昧', '异性', '舔狗', '彩礼', '抑郁', '疯狂', '恋', '植发', '分享', '生理性', '婚姻', '男', '女', '虐文', '肉体', '沉迷',
+        '为什么我', '只能', '其实', '真的', '听过', '洗白', '焦虑', '劝退', '人生', '底层', '匿名', '路子', '陌生人',
+        '电视剧', '中年危机', '亲戚', '夫妻', '内向', '玄', '修炼',
+    ];
+    const badgeTextStopWords = ['全网', '同名', '家居', '家电', '优质', '文案', '好物', '推荐', '合作', '简介'];
     const targetSelector = '.Topstory-content, .QuestionPage-main';
     const cardSelector = '.Card:not([data-zf-processed])';
     const titleSelector = '.ContentItem-title, [data-za-detail-view-element_name="Title"], .QuestionHeader-title';
+    const badgeTextSelector = '.AuthorInfo-badgeText';
     const menuSelector = '.Menu-item';
     const menuText = '不感兴趣';
     const menuTimeout = 2000; // 菜单等待超时时间
@@ -43,6 +51,7 @@
 
             // 第二阶段：点击屏蔽项
             menuItem.click();
+            console.log('✅ 已屏蔽内容');
             return true;
         } catch (e) {
             console.error('❌ 屏蔽流程异常:', e);
@@ -76,11 +85,17 @@
             return;
         }
 
-        if (stopWords.some(w => title.includes(w))) {
+        if (titleStopWords.some(w => title.includes(w))) {
             card.dataset.zfStatus = 'processing';
             performBlock(card);
         } else {
-            card.dataset.zfStatus = 'passed';
+            const badgeText = card.querySelector(badgeTextSelector)?.textContent.trim();
+            if (badgeTextStopWords.some(w => badgeText.includes(w))) {
+                card.dataset.zfStatus = 'processing';
+                performBlock(card);
+            } else {
+                card.dataset.zfStatus = 'passed';
+            }
         }
     };
 
